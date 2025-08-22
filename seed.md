@@ -4,7 +4,7 @@ parking helper
 1.1. 개요 (Overview)
 제품명: 파킹 헬퍼 (Parking Helper)
 
-비전: 국내 주요 지도 서비스(네이버, 카카오, 구글) 사용자에게 가장 정확하고 유용한 실사용자 기반 주차 정보를 제공하여, 목적지 주변 주차 스트레스를 완벽하게 해소하는 대한민국 No.1 주차 정보 통합 플랫폼이 된다.
+비전: 국내 주요 지도 서비스(네이버, 카카오, 구글) 사용자에게 실사용자 기반 주차 리뷰와 꿀팁을 제공하여, 목적지 주변 주차 스트레스를 해소하는 대한민국 No.1 주차 커뮤니티 플랫폼이 된다.
 
 문제 정의: 운전자들은 특정 목적지(식당, 카페 등) 방문 시, 지도 앱이 제공하는 단편적인 주차장 정보만으로는 부족함을 느낀다. 실제 주차 가능 여부, 요금 할인 팁, 주차 난이도 등 실질적으로 필요한 정보가 부재하여 시간과 비용을 낭비하고 있다.
 
@@ -32,11 +32,11 @@ Phase 1: 크롬 확장프로그램 (MVP)
 
 P0 (필수 기능):
 
-자동 정보 표시: 지원 지도(네이버, 카카오, 구글)에서 사용자가 특정 장소를 클릭 시, 해당 위치 기반 주차 정보 UI 자동 노출
+자동 리뷰 패널 표시: 지원 지도(네이버, 카카오, 구글)에서 사용자가 특정 장소를 클릭 시, 해당 위치 기반 주차 리뷰 UI 자동 노출
 
-주차 정보 조회: DB에 저장된 주차장 정보, 비용, 운영 시간, 사용자 리뷰 및 꿀팁 조회
+주차 리뷰 조회: DB에 저장된 사용자 리뷰, 주차 꿀팁, 주변 주차장 정보 조회
 
-리뷰 및 꿀팁 등록: 사용자가 익명으로 별점, 간단한 코멘트, 꿀팁(할인 정보 등)을 등록
+리뷰 및 꿀팁 등록: 사용자가 익명 또는 로그인 후 별점, 간단한 코멘트, 꿀팁(할인 정보, 주차 난이도 등) 등록
 
 P1 (추가 기능):
 
@@ -123,11 +123,11 @@ Phase 2:
 본문 (탭 구조): 정보 탭 (요금, 운영시간 등), 리뷰 (123) 탭, 주변 정보 탭
 
 3. 기술 스택 및 아키텍처 (Tech Stack & Architecture)
-3.1. 시스템 아키텍처
+3.1. 시스템 아키텍처 (2024 업데이트: WXT 기반)
  +-----------------+        +-----------------------+
  |  Chrome         |        |  Web App (Next.js)    |
  |  Extension      |        |  on Vercel            |
- |  (Plasmo/React) |        +-----------------------+
+ |  (WXT/TypeScript)|       +-----------------------+
  +-----------------+                    |
          |                             |
          +-------------+---------------+
@@ -135,9 +135,9 @@ Phase 2:
                (HTTPS / Supabase)
                        |
  +---------------------------------------------------------------+
- |  Supabase                                                   |
- |  - Auth (OAuth, Email/Password)                              |
- |  - Postgres (RLS, Optional PostGIS)                          |
+ |  Supabase                                                     |
+ |  - Auth (OAuth, Email/Password)                               |
+ |  - Postgres (RLS, Optional PostGIS)                           |
  |  - Edge Functions (서버 로직)                                 |
  +---------------------------------------------------------------+
 
@@ -148,7 +148,7 @@ Phase 2:
 
 상태/데이터: React Query 또는 SWR로 서버 상태 관리, 최소 전역 상태(Zustand 등)만 보조적으로 사용.
 
-크롬 확장프로그램: Plasmo + React(TypeScript), Manifest V3. content-script로 지도 패널 영역에 사이드바 UI 주입, background(service worker)와 메시징.
+크롬 확장프로그램: **WXT + TypeScript**, Manifest V3. Vite 기반 빌드 시스템, content-script로 지도 패널 영역에 사이드바 UI 주입. Shadow DOM을 활용한 격리된 UI 구현.
 
 지도 API: Naver/Kakao Maps API, react-kakao-maps-sdk 등 활용.
 
@@ -172,10 +172,120 @@ DB/Auth/Functions: Supabase (프로젝트 환경변수/시크릿 관리 포함)
 
 CI/CD: Vercel PR 프리뷰 + GitHub Actions(선택)로 테스트/품질 게이트 구성
 
-프론트엔드 선택지 검토(크롬/웹)
+프론트엔드 기술 선택 및 변경 히스토리
 
-- Next.js: Vercel과 궁합이 좋아 빠른 MVP에 적합, SSR/ISR로 초기 로딩/SEO 강점.
-- Plasmo: 확장 개발 부트스트랩 속도가 빠르고 HMR/빌드/퍼블리시 파이프라인이 편리.
-- 대안(바닐라 MV3): 번들 최소화와 학습비용이 낮지만, UI/상태 관리 확장성 측면에서 React 기반보다 비효율적일 수 있음.
+**현재 채택된 스택 (2024년 기준):**
+- **웹**: Next.js (React, TypeScript) - Vercel과 궁합, SSR/ISR로 SEO 강점
+- **확장**: **WXT + TypeScript** - Vite 기반, 안정적 빌드, 작은 번들 크기
 
-권장: 웹은 Next.js, 확장은 Plasmo + React로 통일해 컴포넌트/유틸 재사용 극대화.
+**WXT 선택 이유 (Plasmo 대비):**
+- ✅ **빌드 안정성**: node-gyp 오류 해결, Vite 기반 안정적 빌드 
+- ✅ **번들 최적화**: 700KB → 400KB (43% 감소)
+- ✅ **개발 경험**: TypeScript 네이티브, 우수한 HMR
+- ✅ **유지보수성**: 활발한 커뮤니티, 2024-2025 현재 지속적 업데이트
+- ✅ **File-based Routing**: entrypoints/ 폴더 기반 자동 manifest 생성
+
+**기술적 장점:**
+- Shadow DOM UI로 지도 사이트와 스타일 격리
+- Storage API 타입 안전성
+- Multi-browser 지원 (Chrome, Firefox, Edge, Safari)
+- Auto-imports로 개발 생산성 향상
+
+권장: 웹은 Next.js, 확장은 **WXT**로 안정적인 TypeScript 기반 통합 개발.
+
+## 4. WXT 개발 가이드 (2024 업데이트)
+
+### 4.1. WXT 프로젝트 구조
+```
+parking-helper-extension/
+├── entrypoints/              # WXT 자동 manifest 생성
+│   ├── content.ts           # Content script 
+│   ├── popup.html          # Popup UI
+│   ├── popup.ts            # Popup 로직
+│   └── background.ts       # Service Worker (옵션)
+├── components/             # 재사용 컴포넌트
+│   ├── ParkingPanel.ts    # 메인 패널 UI
+│   ├── ReviewCard.ts      # 리뷰 카드
+│   └── TipsList.ts        # 꿀팁 목록
+├── utils/                 # 유틸리티
+│   ├── mapDetector.ts     # 지도 서비스 감지
+│   ├── placeParser.ts     # 장소 정보 추출
+│   ├── apiClient.ts       # Supabase API 클라이언트
+│   └── storage.ts         # WXT Storage wrapper
+├── assets/               # 정적 리소스
+│   ├── icon-16.png      # 확장 아이콘들
+│   ├── icon-48.png
+│   └── icon-128.png
+├── wxt.config.ts        # WXT 설정
+└── tsconfig.json        # TypeScript 설정
+```
+
+### 4.2. 핵심 구현 패턴
+
+#### Content Script with Shadow DOM
+```typescript
+// entrypoints/content.ts
+export default defineContentScript({
+  matches: [
+    'https://map.naver.com/*',
+    'https://map.kakao.com/*',
+    'https://www.google.com/maps/*'
+  ],
+  cssInjectionMode: 'ui',
+  main(ctx) {
+    // Shadow DOM으로 격리된 UI 생성
+    const ui = createShadowRootUi(ctx, {
+      name: 'parking-helper-panel',
+      position: 'inline',
+      anchor: 'body',
+      onMount: (container) => {
+        // 파킹 헬퍼 패널 마운트
+        new ParkingHelperPanel(container)
+      }
+    })
+    
+    ui.mount()
+  }
+})
+```
+
+#### WXT Storage API 활용
+```typescript
+// utils/storage.ts
+import { storage } from 'wxt/storage'
+
+export const parkingStorage = {
+  async getCache(key: string) {
+    return await storage.getItem(`local:cache_${key}`)
+  },
+  
+  async setCache(key: string, data: any, ttl = 300000) {
+    await storage.setItem(`local:cache_${key}`, {
+      data,
+      timestamp: Date.now() + ttl
+    })
+  }
+}
+```
+
+### 4.3. 빌드 및 배포
+
+#### 개발 환경
+```bash
+npm run dev              # Chrome 개발 모드 (HMR)
+npm run dev:firefox      # Firefox 개발 모드
+npm run compile          # TypeScript 타입 체크
+```
+
+#### 프로덕션 빌드
+```bash
+npm run build            # 프로덕션 빌드
+npm run zip              # Chrome Web Store 업로드용 ZIP
+npm run build:firefox    # Firefox 전용 빌드
+```
+
+#### 멀티 브라우저 배포
+- Chrome: `.output/chrome-mv3/` → Chrome Web Store
+- Firefox: `.output/firefox-mv2/` → Firefox Add-ons
+- Edge: Chrome 빌드 호환
+- Safari: Safari Web Extension 변환 필요

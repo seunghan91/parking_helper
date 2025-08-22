@@ -1,36 +1,22 @@
 {
   "name": "parking-helper-extension",
   "displayName": "파킹 헬퍼",
-  "version": "0.0.1",
-  "description": "네이버, 카카오, 구글 지도에서 실시간 주차 정보를 제공하는 크롬 확장 프로그램",
+  "version": "1.0.0",
+  "description": "네이버, 카카오, 구글 지도에서 주차 리뷰와 꿀팁을 제공하는 크롬 확장 프로그램",
   "author": "Parking Helper Team",
+  "license": "ISC",
   "scripts": {
-    "dev": "plasmo dev",
-    "build": "plasmo build",
-    "package": "plasmo package"
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "compile": "tsc --noEmit",
+    "postinstall": "wxt prepare"
   },
   "dependencies": {
-    "plasmo": "^0.84.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "@supabase/supabase-js": "^2.39.3"
-  },
-  "devDependencies": {
-    "@types/chrome": "^0.0.258",
-    "@types/node": "^20.11.5",
-    "@types/react": "^18.2.48",
-    "@types/react-dom": "^18.2.18",
-    "typescript": "^5.3.3"
-  },
-  "manifest": {
-    "host_permissions": [
-      "https://map.naver.com/*",
-      "https://map.kakao.com/*",
-      "https://www.google.com/maps/*",
-      "https://maps.google.com/*"
-    ],
-    "permissions": [
-      "storage"
-    ]
+    "@types/chrome": "^0.1.4",
+    "typescript": "^5.9.2",
+    "wxt": "^0.20.8"
   }
 }

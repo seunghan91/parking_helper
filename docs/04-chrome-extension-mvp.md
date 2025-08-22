@@ -1,4 +1,4 @@
-# 04. 크롬 확장 MVP 가이드 (Plasmo + React + MV3)
+# 04. 크롬 확장 MVP 가이드 (WXT + TypeScript + MV3)
 
 ## 상단 체크리스트
 - [x] 지도 도메인 권한 설정
@@ -7,19 +7,20 @@
 - [x] Supabase 근접 검색 연동
 - [x] 빈 상태/오류 처리
 
-## 개발 중 이슈
-- Plasmo 프레임워크 설치 실패로 인해 수동으로 크롬 확장 프로그램 구성
-- TypeScript 컴파일러 없이 간단한 sed 명령으로 JavaScript 변환
-- 실제 API 연동은 Mock 데이터로 대체 (Supabase 프로젝트 설정 후 연동 필요)
+## 개발 상태 업데이트
+- ✅ **해결됨**: WXT 프레임워크로 변경하여 안정적인 빌드 환경 확보
+- ✅ TypeScript 네이티브 지원으로 타입 안전성 확보
+- ⚠️ **진행 중**: Supabase 프로젝트 설정 및 실제 API 연동 (현재 Mock 데이터)
 
-# 크롬 확장 MVP 가이드 (Plasmo + React + MV3)
+# 크롬 확장 MVP 가이드 (WXT + TypeScript + MV3)
 
 ## 목표
-- 네이버/카카오/구글 지도 페이지에 사이드바 패널을 주입해 주차 정보 요약을 보여준다.
+- 네이버/카카오/구글 지도 페이지에 사이드바 패널을 주입해 주차 리뷰와 꿀팁을 보여준다.
 
 ## 스택
-- Plasmo Framework, React(TypeScript), Manifest V3
-- Supabase 클라이언트로 읽기 전용 쿼리 (익명 키)
+- **WXT Framework**: Vite 기반 빌드 시스템, TypeScript 네이티브 지원
+- **Manifest V3**: 최신 Chrome Extension 표준
+- **Supabase 클라이언트**: 읽기 전용 쿼리 (익명 키)
 
 ## DOM Hook 전략
 - URL 감지: `history.pushState`/`popstate`와 `location.href` 변화 감시
@@ -31,11 +32,101 @@
 ## 타깃 도메인
 - `https://map.naver.com/*`, `https://map.kakao.com/*`, `https://www.google.com/maps/*`
 
-## 빠른 시작
+## 빠른 시작 (WXT)
 ```bash
-pnpm dlx plasmo init parking-helper-ext
-cd parking-helper-ext
-pnpm i
+# WXT 프로젝트 생성
+mkdir parking-helper-extension && cd parking-helper-extension
+npm init -y
+npm install wxt typescript @types/chrome
+
+# TypeScript 설정 및 WXT 준비
+npm run postinstall
+
+# 개발 서버 시작 (HMR 지원)
+npm run dev
+
+# 프로덕션 빌드
+npm run build
+```
+
+### 프로젝트 구조 (WXT File-based Routing)
+```
+parking-helper-extension/
+├── entrypoints/           # 자동으로 manifest 엔트리 생성
+│   ├── content.ts        # Content script
+│   ├── popup.html        # Popup HTML
+│   ├── popup.ts          # Popup TypeScript
+│   └── background.ts     # Service Worker (선택사항)
+├── components/           # 재사용 가능한 컴포넌트
+│   └── ParkingPanel.ts   # 파킹 패널 UI 로직
+├── utils/                # 유틸리티 함수
+│   ├── mapDetector.ts    # 지도 서비스 감지
+│   ├── placeParser.ts    # 장소 정보 파싱
+│   └── apiClient.ts      # API 호출 로직
+├── assets/               # 정적 파일
+│   └── icon-*.png        # 아이콘들
+├── wxt.config.ts         # WXT 설정
+└── tsconfig.json         # TypeScript 설정
+```
+
+### WXT 설정 (`wxt.config.ts`)
+```ts
+import { defineConfig } from 'wxt'
+
+export default defineConfig({
+  manifest: {
+    name: '파킹 헬퍼',
+    description: '네이버, 카카오, 구글 지도에서 주차 리뷰와 꿀팁 제공',
+    version: '1.0.0',
+    host_permissions: [
+      'https://map.naver.com/*',
+      'https://map.kakao.com/*',
+      'https://www.google.com/maps/*',
+      'https://maps.google.com/*'
+    ],
+    permissions: ['storage'],
+    icons: {
+      16: 'icon-16.png',
+      48: 'icon-48.png', 
+      128: 'icon-128.png'
+    }
+  },
+  outDir: '.output'
+})
+```
+
+### Content Script (`entrypoints/content.ts`)
+```ts
+export default defineContentScript({
+  matches: [
+    'https://map.naver.com/*',
+    'https://map.kakao.com/*', 
+    'https://www.google.com/maps/*'
+  ],
+  cssInjectionMode: 'ui',
+  main(ctx) {
+    // WXT의 콘텍스트 활용
+    console.log('파킹 헬퍼 확장 프로그램 로드됨')
+    
+    // UI 생성 (WXT의 createShadowRootUi 활용)
+    const ui = createShadowRootUi(ctx, {
+      name: 'parking-helper-panel',
+      position: 'inline',
+      anchor: 'body',
+      onMount: (container) => {
+        // 파킹 헬퍼 패널 마운트
+        initParkingHelper(container)
+      }
+    })
+    
+    ui.mount()
+  }
+})
+
+function initParkingHelper(container: HTMLElement) {
+  // 기존 ParkingHelperExtension 로직을 여기에 구현
+  const parkingHelper = new ParkingHelperExtension(container)
+}
 ```
 
 ## 성능 버짓
