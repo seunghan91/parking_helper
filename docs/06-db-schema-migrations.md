@@ -1,10 +1,10 @@
 # 06. DB 스키마 & RLS (Supabase)
 
 ## 상단 체크리스트
-- [ ] 핵심 테이블 생성(profiles/parking_lots/reviews/tips)
-- [ ] 장소 테이블(place/aliases/links) 생성
-- [ ] RLS 정책 적용 및 검증
-- [ ] 시드 데이터 주입
+- [x] 핵심 테이블 생성(profiles/parking_lots/reviews/tips)
+- [x] 장소 테이블(place/aliases/links) 생성
+- [x] RLS 정책 적용 및 검증
+- [x] 시드 데이터 주입
 
 # DB 스키마 & RLS (Supabase)
 

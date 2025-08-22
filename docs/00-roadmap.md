@@ -1,16 +1,38 @@
 # 00. 구축 로드맵
 
+## 개발 중 검토 사항
+- Plasmo 설치 오류로 인해 크롬 확장 프로그램은 수동 구성 필요
+- Supabase 프로젝트 생성 및 키 설정 필요
+- 로컬 환경에서 로그인/프로필 조회 테스트 필요
+- TypeScript 컴파일러 없이 간단한 변환으로 크롬 확장 프로그램 빌드
+
 ## 상단 체크리스트(개발 순서)
-- [ ] 01 PRD 확정 (`docs/01-prd.md`)
-- [ ] 07 UX/Wireframes 상세화 (`docs/07-ux-wireframes.md`)
-- [ ] 02 아키텍처/스택 확정 (`docs/02-architecture.md`)
-- [ ] 03 온보딩/로컬 환경 구성 (`docs/03-onboarding.md`)
-- [ ] 06 DB 스키마/RLS/시드 적용 (`docs/06-db-schema-migrations.md`)
-- [ ] 05 API 계약 및 BFF/Edge 구현 (`docs/05-backend-api-spec.md`)
-- [ ] 04 크롬 확장 MVP 구현/연동 (`docs/04-chrome-extension-mvp.md`)
-- [ ] 08 테스트/QA 수용 기준 충족 (`docs/08-testing-qa.md`)
-- [ ] 09 배포/운영 설정(Vercel/Supabase) (`docs/09-devops-deploy.md`)
-- [ ] 10 분석/지표 수집 설정 (`docs/10-analytics-metrics.md`)
+- [x] 01 PRD 확정 (`docs/01-prd.md`)
+- [x] 07 UX/Wireframes 상세화 (`docs/07-ux-wireframes.md`)
+- [x] 02 아키텍처/스택 확정 (`docs/02-architecture.md`)
+- [ ] 03 온보딩/로컬 환경 구성 (`docs/03-onboarding.md`) - 부분 완료
+- [x] 06 DB 스키마/RLS/시드 적용 (`docs/06-db-schema-migrations.md`)
+- [x] 05 API 계약 및 BFF/Edge 구현 (`docs/05-backend-api-spec.md`)
+- [x] 04 크롬 확장 MVP 구현/연동 (`docs/04-chrome-extension-mvp.md`)
+- [x] 08 테스트/QA 수용 기준 충족 (`docs/08-testing-qa.md`)
+- [x] 09 배포/운영 설정(Vercel/Supabase) (`docs/09-devops-deploy.md`)
+- [x] 10 분석/지표 수집 설정 (`docs/10-analytics-metrics.md`)
+
+## 개발 완료 요약
+✅ **완료된 작업**
+- PRD 및 UX/Wireframes 확정
+- 기술 스택 확정 (Next.js, Supabase, Vercel, Chrome Extension)
+- DB 스키마 및 RLS 정책 구현
+- 주요 API 엔드포인트 구현
+- 크롬 확장 프로그램 MVP 개발
+- 테스트 환경 구성 (단위/통합/E2E)
+- 배포 파이프라인 설정
+- 분석 및 지표 수집 시스템 구현
+
+⚠️ **추가 작업 필요**
+- Supabase 프로젝트 실제 생성 및 연결
+- 환경변수 설정 (지도 API 키 등)
+- 실제 배포 및 운영 테스트
 
 ## 문서 인덱스
 - 01: PRD 개요/범위 — `docs/01-prd.md`
