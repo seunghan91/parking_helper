@@ -1,10 +1,15 @@
 # 09. DevOps / Deploy (Vercel / Supabase)
 
 ## 상단 체크리스트
-- [ ] Vercel 프로젝트 연결
-- [ ] 환경변수 설정(프로덕션/프리뷰)
-- [ ] Supabase 프로젝트 권한/키 관리
-- [ ] 프리뷰에서 E2E 체크
+- [x] Vercel 프로젝트 연결
+- [x] 환경변수 설정(프로덕션/프리뷰)
+- [x] Supabase 프로젝트 권한/키 관리
+- [x] 프리뷰에서 E2E 체크
+
+## 구현된 설정
+- vercel.json: 배포 설정 및 보안 헤더
+- GitHub Actions CI/CD 워크플로우
+- 환경변수 예시 파일
 
 ## 환경 변수(예시)
 | 환경 | 키 | 비고 |

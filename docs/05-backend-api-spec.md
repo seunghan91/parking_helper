@@ -1,10 +1,10 @@
 # 05. API 명세 (Supabase / Edge Functions / BFF)
 
 ## 상단 체크리스트
-- [ ] 인증(JWT) 적용 확인
-- [ ] 검색/상세 API 응답 스키마 동결
-- [ ] 리뷰/팁 작성 권한/RLS 확인
-- [ ] 장소 수집/중복해결 API 초안 구현
+- [x] 인증(JWT) 적용 확인
+- [x] 검색/상세 API 응답 스키마 동결
+- [x] 리뷰/팁 작성 권한/RLS 확인
+- [x] 장소 수집/중복해결 API 초안 구현
 
 # API 명세 (Supabase / Edge Functions / BFF)
 

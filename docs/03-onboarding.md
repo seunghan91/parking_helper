@@ -1,11 +1,15 @@
 # 03. 온보딩 가이드 (Supabase / Next.js / Vercel / Plasmo)
 
 ## 상단 체크리스트
-- [ ] Node/패키지 매니저 설치
+- [x] Node/패키지 매니저 설치
 - [ ] Supabase 프로젝트/키 설정
-- [ ] .env.local 구성
+- [x] .env.local 구성
 - [ ] 로컬 로그인/프로필 조회 성공
 - [ ] Vercel 프리뷰 배포 확인
+
+## 개발 중 이슈
+- Plasmo 설치 시 node-gyp 빌드 오류 발생 (크롬 확장 프로그램)
+- 해결 방안: 수동으로 크롬 확장 프로그램 구조 구성 필요
 
 # 온보딩 가이드 (Supabase / Next.js / Vercel / Plasmo)
 
