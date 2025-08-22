@@ -13,6 +13,9 @@
 
 ## 테이블 설계
 ```sql
+-- (선택) 위치 검색 강화를 위한 PostGIS
+-- create extension if not exists postgis;
+
 -- profiles: auth.users(id)와 1:1 확장
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,
@@ -63,18 +66,44 @@ create table if not exists public.parking_lots (
   created_at timestamptz default now()
 );
 
--- reviews: 사용자 리뷰/평점
+-- reviews: 사용자 리뷰/평점 (업체/주차장/좌표 대상 지원)
 create table if not exists public.reviews (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
-  parking_lot_id uuid not null references public.parking_lots(id) on delete cascade,
+  subject_type text not null check (subject_type in ('parking_lot','place','location')),
+  parking_lot_id uuid references public.parking_lots(id) on delete cascade,
+  place_id uuid references public.places(id) on delete set null,
+  latitude double precision,
+  longitude double precision,
   rating int check (rating between 1 and 5),
   comment text,
   helpful_count int default 0,
-  created_at timestamptz default now()
+  created_at timestamptz default now(),
+  -- one-of 보장: subject_type에 따른 필수 대상 제약
+  constraint reviews_subject_one_of check (
+    (subject_type = 'parking_lot' and parking_lot_id is not null and place_id is null and latitude is null and longitude is null)
+    or (subject_type = 'place' and place_id is not null and parking_lot_id is null and latitude is null and longitude is null)
+    or (subject_type = 'location' and latitude is not null and longitude is not null and parking_lot_id is null and place_id is null)
+  )
 );
 
+-- 인덱스(권장)
+create index if not exists idx_reviews_parking_lot on public.reviews(parking_lot_id) where subject_type='parking_lot';
+create index if not exists idx_reviews_place on public.reviews(place_id) where subject_type='place';
+
+-- review_helpfuls: 도움돼요(멱등)
+create table if not exists public.review_helpfuls (
+  id uuid primary key default gen_random_uuid(),
+  review_id uuid not null references public.reviews(id) on delete cascade,
+  user_id uuid not null references auth.users(id) on delete cascade,
+  created_at timestamptz default now(),
+  unique(review_id, user_id)
+);
+create index if not exists idx_review_helpfuls_review on public.review_helpfuls(review_id);
+```
+
 -- tips: 꿀팁/할인 정보
+```sql
 create table if not exists public.tips (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null references auth.users(id) on delete cascade,
@@ -119,7 +148,16 @@ create policy "parking_lots_select_all" on public.parking_lots for select using 
 create policy "places_select_all" on public.places for select using (true);
 create policy "place_aliases_select_all" on public.place_aliases for select using (true);
 create policy "place_links_select_all" on public.place_links for select using (true);
+
+-- review_helpfuls: 본인만 추가/삭제, 모두 읽기
+alter table public.review_helpfuls enable row level security;
+create policy "review_helpfuls_select_all" on public.review_helpfuls for select using (true);
+create policy "review_helpfuls_modify_own" on public.review_helpfuls for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
 ```
+
+## 인덱스/옵션
+- reviews: `idx_reviews_parking_lot`, `idx_reviews_place` 유지
+- (선택) PostGIS 사용 시 `places`/`parking_lots`에 `geom geography(Point,4326)` 컬럼과 GIST 인덱스 추가 권장
 
 ## 시드 데이터(예시)
 ```sql

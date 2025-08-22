@@ -6,13 +6,25 @@
 - [ ] Supabase 프로젝트 권한/키 관리
 - [ ] 프리뷰에서 E2E 체크
 
-## Vercel
-- GitHub 연동 → Framework: Next.js 자동 인식
-- Env: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-
-## Supabase
-- Auth Provider 설정(구글)
-- RLS 정책 배포 스크립트 관리(SQL)
+## 환경 변수(예시)
+| 환경 | 키 | 비고 |
+|---|---|---|
+| Preview/Prod | NEXT_PUBLIC_SUPABASE_URL | 클라이언트 공개 |
+| Preview/Prod | NEXT_PUBLIC_SUPABASE_ANON_KEY | 클라이언트 공개 |
+| Server only | SUPABASE_SERVICE_ROLE_KEY | 서버에서만 사용(Edge/Route) |
 
 ## 배포 흐름
 - PR 생성 → 프리뷰 배포 → QA 체크리스트 통과 → main 병합 → 프로덕션 배포
+
+## 백업/보안
+- Supabase: 자동 백업 정책 확인, 주기/보관주기 설정
+- RLS 정책은 SQL로 버전 관리, 비상 시 점검 모드 절차 정의
+
+## 모니터링/관측성
+- Vercel: 프로젝트 로그/에러 알림
+- Supabase: 쿼리 성능/에러 로그
+- (선택) Sentry: 프론트/확장 오류 추적
+
+## 롤백
+- 프론트: Vercel에서 이전 빌드로 Promote
+- DB: 백업 스냅샷 복구 절차 문서화
