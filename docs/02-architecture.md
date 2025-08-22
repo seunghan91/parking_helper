@@ -1,7 +1,7 @@
 # 02. 아키텍처 / 기술 스택
 
 ## 상단 체크리스트
-- [x] 웹/확장 공통 스택 확정(Next.js/Plasmo/TS)
+- [x] 웹/확장 공통 스택 확정(Next.js/WXT/TS)
 - [x] Supabase(Auth/DB/~Storage, Edge) 사용 확정
 - [x] 배포(Vercel) 및 환경변수 키 맵 확정
 - [x] 데이터 흐름/시퀀스 다이어그램 합의
@@ -11,7 +11,7 @@
 +-----------------+        +-----------------------+
 |  Chrome         |        |  Web App (Next.js)    |
 |  Extension      |        |  on Vercel            |
-|  (Plasmo/React) |        +-----------------------+
+|  (WXT/React)    |        +-----------------------+
 +-----------------+                    |
         |                             |
         +-------------+---------------+
@@ -31,7 +31,7 @@
 ### 프론트엔드
 - **웹 서비스**: Next.js (React, TypeScript) - App Router 기반, Vercel에 최적화된 서버/클라이언트 컴포넌트 혼합 아키텍처
 - **상태/데이터**: React Query 또는 SWR로 서버 상태 관리, 최소 전역 상태(Zustand 등)만 보조적으로 사용
-- **크롬 확장프로그램**: Plasmo + React(TypeScript), Manifest V3. content-script로 지도 패널 영역에 사이드바 UI 주입
+- **크롬 확장프로그램**: WXT + React(TypeScript), Manifest V3. content-script로 지도 패널 영역에 사이드바 UI 주입
 - **지도 API**: Naver/Kakao Maps API, react-kakao-maps-sdk 등 활용
 
 ### 백엔드/서버 로직

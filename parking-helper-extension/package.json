@@ -4,33 +4,37 @@
   "version": "0.0.1",
   "description": "네이버, 카카오, 구글 지도에서 실시간 주차 정보를 제공하는 크롬 확장 프로그램",
   "author": "Parking Helper Team",
+  "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "plasmo dev",
-    "build": "plasmo build",
-    "package": "plasmo package"
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "compile": "tsc --noEmit",
+    "postinstall": "wxt prepare",
+    "test": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest --coverage"
   },
   "dependencies": {
-    "plasmo": "^0.84.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "@supabase/supabase-js": "^2.39.3"
   },
   "devDependencies": {
+    "wxt": "^0.19.1",
     "@types/chrome": "^0.0.258",
-    "@types/node": "^20.11.5",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
-    "typescript": "^5.3.3"
-  },
-  "manifest": {
-    "host_permissions": [
-      "https://map.naver.com/*",
-      "https://map.kakao.com/*",
-      "https://www.google.com/maps/*",
-      "https://maps.google.com/*"
-    ],
-    "permissions": [
-      "storage"
-    ]
+    "@wxt-dev/module-react": "^1.0.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.0",
+    "@testing-library/react": "^14.1.2",
+    "@testing-library/jest-dom": "^6.2.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "jsdom": "^23.2.0"
   }
 }

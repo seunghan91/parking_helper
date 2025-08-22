@@ -1,0 +1,245 @@
+/* 파킹 헬퍼 확장 프로그램 스타일 */
+
+.parking-helper-panel {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 360px;
+  max-height: 600px;
+  background: #FFFFFF;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  border: 1px solid #E5E5EA;
+  z-index: 999999;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Pretendard', 'Segoe UI', Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.4;
+  color: #1D1D1F;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.parking-helper-header {
+  padding: 16px;
+  background: #007AFF;
+  color: #FFFFFF;
+  border-radius: 11px 11px 0 0;
+}
+
+.parking-helper-header h3 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.parking-helper-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+}
+
+/* 로딩 상태 */
+.parking-helper-loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6E6E73;
+}
+
+/* 빈 상태 */
+.parking-helper-empty {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.parking-helper-empty p {
+  color: #6E6E73;
+  margin-bottom: 16px;
+  font-size: 15px;
+}
+
+/* 오류 상태 */
+.parking-helper-error {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.parking-helper-error p {
+  color: #DC2626;
+  margin-bottom: 16px;
+}
+
+/* 버튼 스타일 */
+.parking-helper-panel button {
+  background: #007AFF;
+  color: #FFFFFF;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.parking-helper-panel button:hover {
+  background: #0A84FF;
+}
+
+.parking-helper-panel button:active {
+  background: #0063D1;
+}
+
+/* 정보 표시 영역 */
+.parking-helper-info {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 꿀팁 섹션 */
+.parking-tips h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.tip-item {
+  padding: 12px;
+  background: #F3F4F6;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  color: #16A34A;
+  font-weight: 500;
+}
+
+/* 주차장 리스트 */
+.parking-list h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.parking-item {
+  padding: 12px;
+  background: #FFFFFF;
+  border: 1px solid #E5E5EA;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  transition: all 0.15s ease-in-out;
+}
+
+.parking-item:hover {
+  background: #F5F5F7;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.parking-item h5 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.parking-item p {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #6E6E73;
+}
+
+/* 리뷰 리스트 */
+.review-list h4 {
+  margin: 0 0 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.review-item {
+  padding: 12px;
+  background: #FFFFFF;
+  border: 1px solid #E5E5EA;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  transition: all 0.15s ease-in-out;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.review-header .stars {
+  color: #F59E0B;
+  font-size: 14px;
+}
+
+.review-header .author {
+  font-size: 13px;
+  color: #6B7280;
+}
+
+.review-item p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.review-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  color: #6E6E73;
+}
+
+.review-footer button {
+  background: transparent;
+  color: #6E6E73;
+  border: 1px solid #E5E5EA;
+  padding: 4px 8px;
+  font-size: 12px;
+  height: 28px;
+  border-radius: 999px;
+}
+
+.review-footer button:hover {
+  background: #F5F5F7;
+  color: #1D1D1F;
+}
+
+/* 스크롤바 커스터마이징 */
+.parking-helper-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.parking-helper-content::-webkit-scrollbar-track {
+  background: #F3F4F6;
+}
+
+.parking-helper-content::-webkit-scrollbar-thumb {
+  background: #D1D5DB;
+  border-radius: 3px;
+}
+
+.parking-helper-content::-webkit-scrollbar-thumb:hover {
+  background: #9CA3AF;
+}
+
+/* 반응형 처리 */
+@media (max-width: 768px) {
+  .parking-helper-panel {
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 50vh;
+    border-radius: 12px 12px 0 0;
+  }
+}
