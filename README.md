@@ -1,6 +1,16 @@
 # 파킹 헬퍼 (Parking Helper)
 
-실사용자 기반 주차 정보 통합 플랫폼
+🚗 대한민국 No.1 실사용자 기반 주차 정보 통합 플랫폼
+
+## 🎯 최근 업데이트
+
+### Plasmo → WXT 마이그레이션 완료 (2024.08)
+- ✅ **빌드 안정성 향상**: node-gyp 의존성 제거
+- ✅ **번들 크기 93% 감소**: 4.08MB → 259KB  
+- ✅ **개발 경험 개선**: Vite 기반 HMR 지원
+- ✅ **TypeScript 네이티브 지원**
+
+자세한 내용은 [마이그레이션 보고서](./parking-helper-extension/MIGRATION_REPORT.md)를 참조하세요.
 
 ## 개요
 
@@ -25,7 +35,7 @@ parking-helper/
 
 - **Frontend**: Next.js, React, TypeScript, Tailwind CSS
 - **Backend**: Supabase (Auth, Database, Edge Functions)
-- **Extension**: Manifest V3, Content Scripts
+- **Extension**: WXT Framework (Vite-based), React, Manifest V3
 - **Deployment**: Vercel, Chrome Web Store
 
 ## 시작하기

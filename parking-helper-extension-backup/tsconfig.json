@@ -11,13 +11,10 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true,
-    "types": ["chrome", "@wxt-dev/module-react/client"]
+    "noEmit": false,
+    "outDir": "./dist",
+    "rootDir": "./src"
   },
-  "include": [
-    "entrypoints/**/*",
-    "components/**/*",
-    "utils/**/*",
-    "wxt.config.ts"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
