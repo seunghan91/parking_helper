@@ -1,4 +1,5 @@
 import { defineContentScript } from 'wxt/sandbox';
+import { browser } from 'wxt/browser';
 
 export default defineContentScript({
   matches: [
@@ -7,6 +8,7 @@ export default defineContentScript({
     'https://www.google.com/maps/*',
     'https://maps.google.com/*'
   ],
+  runAt: 'document_idle',
   main() {
     console.log('파킹 헬퍼 콘텐츠 스크립트 로드됨');
 
@@ -104,11 +106,48 @@ export default defineContentScript({
     // 장소명 추출
     function extractPlaceName(): string {
       if (currentMapService === 'naver') {
-        // 네이버 지도에서 장소명 추출
-        const nameEl = document.querySelector('.place_bluelink') || 
-                       document.querySelector('.title_text') ||
-                       document.querySelector('[class*="place_name"]');
-        return nameEl?.textContent?.trim() || '';
+        // 네이버 지도에서 장소명 추출 - 2024년 최신 선택자들
+        const selectors = [
+          '#_title > span:first-child',     // 최신 네이버 지도 UI
+          '#_title span.GHAhO',              // 장소 상세 페이지
+          '.place_bluelink',                 // 기본 장소 링크
+          '.title_text',                     // 제목 텍스트  
+          'span.YouOG',                      // 새 UI 장소명
+          '.Fc1rA',                          // 헤더 장소명
+          '.LDgIH',                          // 장소 제목
+          '[class*="place_name"]',          // place_name 포함 클래스
+          '.place_section_content h1',       // 섹션 내 h1
+          '.place_section_content h2',       // 섹션 내 h2
+        ];
+        
+        for (const selector of selectors) {
+          try {
+            const nameEl = document.querySelector(selector);
+            if (nameEl?.textContent?.trim()) {
+              const placeName = nameEl.textContent.trim();
+              if (!placeName.includes('로딩') && !placeName.includes('...') && placeName.length > 1) {
+                console.log(`네이버 장소명 찾음 (${selector}):`, placeName);
+                return placeName;
+              }
+            }
+          } catch (e) {
+            // 선택자 에러 무시
+          }
+        }
+        
+        // 모든 h1, h2 태그 검사 (fallback)
+        const headings = document.querySelectorAll('h1, h2');
+        for (const heading of headings) {
+          const text = heading.textContent?.trim();
+          if (text && text.length > 1 && text.length < 50 && 
+              !text.includes('로딩') && !text.includes('...')) {
+            console.log(`네이버 장소명 찾음 (heading fallback):`, text);
+            return text;
+          }
+        }
+        
+        console.log('네이버 지도에서 장소명을 찾을 수 없음');
+        return '';
       } else if (currentMapService === 'kakao') {
         // 카카오맵에서 장소명 추출
         const nameEl = document.querySelector('.link_name') ||
@@ -414,14 +453,51 @@ export default defineContentScript({
         if (currentPlaceId) {
           console.log('장소 감지:', currentPlaceId);
           
-          // 기본 장소 데이터 설정
-          currentPlaceData = {
-            name: extractPlaceName(),
-            address: extractPlaceAddress(),
-            reviewCount: 0,
-            tipCount: 0,
-            rating: '-'
+          // 네이버 지도는 지연 처리
+          const extractPlaceInfo = () => {
+            currentPlaceData = {
+              name: extractPlaceName(),
+              address: extractPlaceAddress(),
+              reviewCount: 0,
+              tipCount: 0,
+              rating: '-'
+            };
+            
+            // 장소명이 없으면 재시도
+            if (!currentPlaceData.name && currentMapService === 'naver') {
+              let retryCount = 0;
+              const maxRetries = 3;
+              
+              const retryExtraction = () => {
+                retryCount++;
+                const retryName = extractPlaceName();
+                const retryAddress = extractPlaceAddress();
+                
+                if (retryName && retryName !== '장소명 없음') {
+                  console.log(`재시도 ${retryCount}번째로 장소명 찾음:`, retryName);
+                  currentPlaceData = {
+                    ...currentPlaceData,
+                    name: retryName,
+                    address: retryAddress || currentPlaceData.address
+                  };
+                } else if (retryCount < maxRetries) {
+                  console.log(`장소명 추출 재시도 ${retryCount}/${maxRetries}...`);
+                  setTimeout(retryExtraction, 1000 * retryCount);
+                } else {
+                  console.log('장소명을 찾을 수 없음 - 최대 재시도 횟수 초과');
+                }
+              };
+              
+              setTimeout(retryExtraction, 1000);
+            }
           };
+          
+          // 네이버 지도는 지연 실행
+          if (currentMapService === 'naver') {
+            setTimeout(extractPlaceInfo, 500);
+          } else {
+            extractPlaceInfo();
+          }
           
           // UI 패널이 없으면 생성
           if (!uiInjected) {
@@ -468,13 +544,13 @@ export default defineContentScript({
       const originalPushState = history.pushState;
       const originalReplaceState = history.replaceState;
       
-      history.pushState = function() {
-        originalPushState.apply(history, arguments as any);
+      history.pushState = function(...args) {
+        originalPushState.apply(history, args);
         setTimeout(detectUrlChange, 100);
       };
       
-      history.replaceState = function() {
-        originalReplaceState.apply(history, arguments as any);
+      history.replaceState = function(...args) {
+        originalReplaceState.apply(history, args);
         setTimeout(detectUrlChange, 100);
       };
       
@@ -483,7 +559,7 @@ export default defineContentScript({
       
       // DOM 변경 감지 (SPA 대응) - 더 효율적으로 개선
       let observerTimer: any = null;
-      const observer = new MutationObserver((mutations) => {
+      const observer = new MutationObserver(() => {
         // 너무 자주 실행되지 않도록 디바운스 적용
         if (observerTimer) clearTimeout(observerTimer);
         observerTimer = setTimeout(() => {
@@ -518,7 +594,7 @@ export default defineContentScript({
     }
 
     // 백그라운드 스크립트로부터 메시지 수신
-    browser.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    browser.runtime.onMessage.addListener((request, _sender, sendResponse) => {
       if (request.type === 'MAP_DETECTED') {
         console.log('지도 감지 메시지 수신');
         detectUrlChange();
@@ -545,9 +621,46 @@ export default defineContentScript({
         return true;
       } else if (request.type === 'SHOW_PARKING_DETAILS') {
         // 팝업에서 상세 정보 표시 요청
+        console.log('상세 정보 표시 요청 받음');
+        if (!uiInjected) {
+          createParkingPanel();
+        }
         const panel = document.getElementById('parking-helper-panel');
         if (panel) {
           panel.classList.remove('collapsed');
+        }
+        // 현재 장소 데이터로 패널 업데이트
+        if (currentPlaceId) {
+          fetchParkingData(currentPlaceId);
+        }
+      } else if (request.type === 'SHOW_REVIEW_FORM') {
+        // 팝업에서 리뷰 작성 요청
+        console.log('리뷰 작성 폼 표시 요청 받음');
+        if (!uiInjected) {
+          createParkingPanel();
+        }
+        const panel = document.getElementById('parking-helper-panel');
+        if (panel) {
+          panel.classList.remove('collapsed');
+          // 리뷰 작성 폼 표시 기능 추가 예정
+          const contentDiv = panel.querySelector('.ph-content');
+          if (contentDiv) {
+            contentDiv.innerHTML = `
+              <div class="ph-review-form" style="padding: 20px;">
+                <h3 style="margin: 0 0 15px 0; color: #333;">리뷰 작성하기</h3>
+                <p style="color: #666; font-size: 14px;">이 기능은 곧 추가될 예정입니다.</p>
+                <button onclick="window.location.reload()" style="
+                  margin-top: 15px;
+                  padding: 10px 20px;
+                  background: #667eea;
+                  color: white;
+                  border: none;
+                  border-radius: 6px;
+                  cursor: pointer;
+                ">돌아가기</button>
+              </div>
+            `;
+          }
         }
       }
       

@@ -17,9 +17,9 @@ export default defineBackground(() => {
     console.log('파킹 헬퍼 설치됨:', details.reason);
     
     if (details.reason === 'install') {
-      // 설치 시 환영 페이지 열기
+      // 설치 시 지도 사이트 중 하나를 열기 (네이버 지도)
       browser.tabs.create({
-        url: 'http://localhost:3003/welcome'
+        url: 'https://map.naver.com'
       });
     }
   }

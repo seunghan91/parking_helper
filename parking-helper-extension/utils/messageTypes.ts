@@ -4,6 +4,10 @@ export interface PlaceInfo {
   id: string;
   name: string;
   address: string;
+  buildingName?: string; // 빌딩명 추가
+  buildingId?: string; // 빌딩 고유 ID (주소 기반 생성)
+  floor?: string; // 층 정보
+  unit?: string; // 호수 정보
   reviewCount: number;
   tipCount: number;
   rating: string;

@@ -2,6 +2,11 @@ import { defineConfig } from 'wxt'
 import { resolve } from 'path'
 
 export default defineConfig({
+  dev: {
+    server: {
+      port: 3002,  // WXT 개발 서버 포트 명시적 설정
+    }
+  },
   alias: {
     '@': resolve(__dirname, './'),
     '@/utils': resolve(__dirname, './utils'),
@@ -23,7 +28,19 @@ export default defineConfig({
       16: 'icon-16.png',
       48: 'icon-48.png',
       128: 'icon-128.png'
-    }
+    },
+    content_scripts: [
+      {
+        matches: [
+          'https://map.naver.com/*',
+          'https://map.kakao.com/*',
+          'https://www.google.com/maps/*',
+          'https://maps.google.com/*'
+        ],
+        js: ['content-scripts/content.js'],
+        run_at: 'document_idle'
+      }
+    ]
   },
   outDir: '.output'
 })
