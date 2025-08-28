@@ -27,6 +27,12 @@ export type AnalyticsEvent =
 // 이벤트 추적 함수
 export async function trackEvent(event: AnalyticsEvent): Promise<void> {
   try {
+    // 개발 중에는 콘솔에만 로깅
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 Analytics Event:', event.name, event.payload)
+      return
+    }
+    
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     
@@ -38,14 +44,15 @@ export async function trackEvent(event: AnalyticsEvent): Promise<void> {
       created_at: new Date().toISOString()
     }
     
-    // Supabase에 이벤트 저장
-    const { error } = await supabase
-      .from('events')
-      .insert([eventData])
+    // Supabase에 이벤트 저장 (테이블이 있을 때만)
+    // TODO: events 테이블 생성 후 주석 해제
+    // const { error } = await supabase
+    //   .from('events')
+    //   .insert([eventData])
     
-    if (error) {
-      console.error('Failed to track event:', error)
-    }
+    // if (error) {
+    //   console.error('Failed to track event:', error)
+    // }
     
     // Google Analytics 호출 (옵션)
     if (typeof window !== 'undefined' && (window as any).gtag) {

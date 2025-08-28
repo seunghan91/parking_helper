@@ -159,6 +159,80 @@
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
     }
+    
+    .map-links {
+      padding: 16px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-top: 16px;
+    }
+    
+    .map-links-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #495057;
+      margin: 0 0 12px 0;
+      text-align: center;
+    }
+    
+    .map-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    
+    .map-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.2s;
+      border: 1px solid #e9ecef;
+      background: #f8f9fa;
+      color: #212529;
+    }
+    
+    .map-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    
+    .map-link.naver {
+      background: linear-gradient(135deg, #03c75a 0%, #00a652 100%);
+      color: white;
+      border: none;
+    }
+    
+    .map-link.kakao {
+      background: linear-gradient(135deg, #fee500 0%, #fadb00 100%);
+      color: #3c1e1e;
+      border: none;
+    }
+    
+    .map-link.google {
+      background: linear-gradient(135deg, #4285f4 0%, #1a73e8 100%);
+      color: white;
+      border: none;
+    }
+    
+    .map-icon {
+      font-size: 16px;
+    }
+    
+    .help-text {
+      font-size: 12px;
+      color: #6c757d;
+      text-align: center;
+      margin: 0;
+      line-height: 1.5;
+    }
   </style>
 </head>
 <body>
@@ -173,8 +247,29 @@
       <div>지도 정보를 확인하는 중...</div>
     </div>
     
-    <div id="inactive-view" class="status inactive" style="display: none;">
-      지도 페이지에서 장소를 선택해주세요
+    <div id="inactive-view" style="display: none;">
+      <div class="status inactive">
+        파킹 헬퍼는 지도 사이트에서 작동합니다
+      </div>
+      
+      <div class="map-links">
+        <p class="map-links-title">지도 사이트로 이동하기:</p>
+        <div class="map-buttons">
+          <a href="https://map.naver.com" target="_blank" class="map-link naver">
+            <span class="map-icon">🌐</span>
+            네이버 지도
+          </a>
+          <a href="https://map.kakao.com" target="_blank" class="map-link kakao">
+            <span class="map-icon">🗺️</span>
+            카카오맵
+          </a>
+          <a href="https://maps.google.com" target="_blank" class="map-link google">
+            <span class="map-icon">🌍</span>
+            구글 지도
+          </a>
+        </div>
+        <p class="help-text">위 링크를 클릭하여 지도 사이트로 이동한 후<br>장소를 검색하고 클릭하면 주차 정보를 확인할 수 있습니다.</p>
+      </div>
     </div>
     
     <div id="active-view" style="display: none;">

@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "파킹 헬퍼",
+  "description": "네이버, 카카오, 구글 지도에서 주차 리뷰와 꿀팁을 제공하는 크롬 확장 프로그램",
+  "version": "1.0.0",
+  "icons": {
+    "16": "icon-16.png",
+    "48": "icon-48.png",
+    "128": "icon-128.png"
+  },
+  "host_permissions": [
+    "https://map.naver.com/*",
+    "https://map.kakao.com/*",
+    "https://www.google.com/maps/*",
+    "https://maps.google.com/*",
+    "http://localhost/*"
+  ],
+  "permissions": [
+    "storage",
+    "tabs",
+    "scripting"
+  ],
+  "commands": {
+    "wxt:reload-extension": {
+      "description": "Reload the extension during development",
+      "suggested_key": {
+        "default": "Alt+R"
+      }
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "파킹 헬퍼",
+    "default_popup": "popup.html"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval' http://localhost:3000; object-src 'self';",
+    "sandbox": "script-src 'self' 'unsafe-inline' 'unsafe-eval' http://localhost:3000; sandbox allow-scripts allow-forms allow-popups allow-modals; child-src 'self';"
+  }
+}

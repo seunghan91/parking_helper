@@ -27,6 +27,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // 버튼 클릭 이벤트 핸들러
   viewDetailsBtn?.addEventListener('click', handleViewDetails);
   writeReviewBtn?.addEventListener('click', handleWriteReview);
+  
+  // 지도 링크 클릭 시 팝업 창 닫기
+  const mapLinks = document.querySelectorAll('.map-link');
+  mapLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      setTimeout(() => window.close(), 100);
+    });
+  });
 
   // 현재 탭 상태 확인
   async function checkCurrentTab() {
@@ -143,7 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('리뷰 작성하기');
     
     // 로컬 개발 서버로 연결 (추후 실제 URL로 변경)
-    const reviewUrl = 'http://localhost:3003/review';
+    const reviewUrl = 'http://localhost:3000/review';
     await browser.tabs.create({ url: reviewUrl });
     window.close();
   }
