@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>파킹 헬퍼</title>
+  <style>
+    body {
+      width: 320px;
+      height: 400px;
+      margin: 0;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f8f9fa;
+    }
+    
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e9ecef;
+    }
+    
+    .logo {
+      width: 24px;
+      height: 24px;
+      background: #007bff;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 12px;
+    }
+    
+    .title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #212529;
+    }
+    
+    .content {
+      flex: 1;
+    }
+    
+    .status {
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+    
+    .status.active {
+      background: #d4edda;
+      color: #155724;
+    }
+    
+    .status.inactive {
+      background: #f8d7da;
+      color: #721c24;
+    }
+    
+    .place-info {
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 12px;
+    }
+    
+    .place-name {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #212529;
+    }
+    
+    .place-address {
+      font-size: 14px;
+      color: #6c757d;
+      margin-bottom: 12px;
+    }
+    
+    .parking-stats {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    
+    .stat-item {
+      flex: 1;
+      text-align: center;
+      padding: 8px;
+      background: #f8f9fa;
+      border-radius: 6px;
+    }
+    
+    .stat-value {
+      font-size: 18px;
+      font-weight: 600;
+      color: #007bff;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #6c757d;
+    }
+    
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .btn-primary {
+      background: #007bff;
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: #0056b3;
+    }
+    
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+      margin-top: 8px;
+    }
+    
+    .btn-secondary:hover {
+      background: #545b62;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: #6c757d;
+    }
+    
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #007bff;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 12px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">P</div>
+    <div class="title">파킹 헬퍼</div>
+  </div>
+  
+  <div class="content">
+    <div id="loading-view" class="loading">
+      <div class="spinner"></div>
+      <div>지도 정보를 확인하는 중...</div>
+    </div>
+    
+    <div id="inactive-view" class="status inactive" style="display: none;">
+      지도 페이지에서 장소를 선택해주세요
+    </div>
+    
+    <div id="active-view" style="display: none;">
+      <div class="status active">
+        주차 정보를 찾았습니다!
+      </div>
+      
+      <div class="place-info">
+        <div class="place-name" id="place-name">-</div>
+        <div class="place-address" id="place-address">-</div>
+        
+        <div class="parking-stats">
+          <div class="stat-item">
+            <div class="stat-value" id="review-count">0</div>
+            <div class="stat-label">리뷰</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="tip-count">0</div>
+            <div class="stat-label">꿀팁</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value" id="rating">-</div>
+            <div class="stat-label">평점</div>
+          </div>
+        </div>
+        
+        <button class="btn btn-primary" id="view-details">
+          자세히 보기
+        </button>
+        
+        <button class="btn btn-secondary" id="write-review">
+          리뷰 작성하기
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="./popup.js"></script>
+</body>
+</html>
