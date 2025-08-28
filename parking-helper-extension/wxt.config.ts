@@ -1,6 +1,13 @@
 import { defineConfig } from 'wxt'
+import { resolve } from 'path'
 
 export default defineConfig({
+  alias: {
+    '@': resolve(__dirname, './'),
+    '@/utils': resolve(__dirname, './utils'),
+    '@/components': resolve(__dirname, './components'),
+    '@/entrypoints': resolve(__dirname, './entrypoints'),
+  },
   manifest: {
     name: '파킹 헬퍼',
     description: '네이버, 카카오, 구글 지도에서 주차 리뷰와 꿀팁을 제공하는 크롬 확장 프로그램',

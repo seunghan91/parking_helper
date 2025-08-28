@@ -1,5 +1,5 @@
 {
-  "extends": "wxt/tsconfig.json",
+  "extends": "./.wxt/tsconfig.json",
   "compilerOptions": {
     "strict": true,
     "target": "ES2022",
@@ -8,6 +8,13 @@
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "@/utils/*": ["utils/*"],
+      "@/components/*": ["components/*"],
+      "@/entrypoints/*": ["entrypoints/*"]
+    }
   }
 }
