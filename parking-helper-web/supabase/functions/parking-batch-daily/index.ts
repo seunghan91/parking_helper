@@ -13,19 +13,12 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.37.0';
 // ========================================
 
 interface KoroadsParking {
-  parklot_id: string;
-  parklot_name: string;
-  parklot_tel: string;
-  parklot_addr: string;
-  addr_detail: string;
-  lat: number;
-  lon: number;
-  place_type: string;
-  parking_fee: string;
-  operation_rule: string;
-  operation_start_time: string;
-  operation_end_time: string;
-  capacity: number;
+  prk_center_id: string;          // 주차장 관리 ID
+  prk_plce_nm: string;            // 주차장명
+  prk_plce_adres: string;         // 주차장 도로명 주소
+  prk_plce_entrc_la: number;      // 위도
+  prk_plce_entrc_lo: number;      // 경도
+  prk_cmprt_co: number;           // 주차장의 총 주차구획 수
 }
 
 // ========================================
@@ -33,7 +26,7 @@ interface KoroadsParking {
 // ========================================
 
 class KoroadsApi {
-  private baseUrl = 'https://api.koroad.or.kr/openapi';
+  private baseUrl = 'https://apis.data.go.kr/B553881/Parking';
   private apiKey: string;
 
   constructor(apiKey: string) {
@@ -41,10 +34,11 @@ class KoroadsApi {
   }
 
   async getAllParkings(pageNo: number = 1, pageSize: number = 100) {
-    const url = new URL(`${this.baseUrl}/parkinglot`);
-    url.searchParams.append('apiKey', this.apiKey);
+    const url = new URL(`${this.baseUrl}/PrkSttusInfo`);
+    url.searchParams.append('serviceKey', this.apiKey);
     url.searchParams.append('pageNo', pageNo.toString());
-    url.searchParams.append('pageSize', pageSize.toString());
+    url.searchParams.append('numOfRows', pageSize.toString());
+    url.searchParams.append('format', '2'); // JSON format
 
     const response = await fetch(url.toString());
     if (!response.ok) {
@@ -53,7 +47,7 @@ class KoroadsApi {
 
     const result = await response.json();
     return {
-      data: result.response || [],
+      data: result.PrkSttusInfo || [],
       totalCount: result.totalCount || 0,
     };
   }
@@ -76,7 +70,7 @@ async function runParkingBatchDaily() {
   }
 
   // Supabase 클라이언트 초기화 (Service Role Key 사용)
-  const supabase = createClient(supabaseUrl, supabaseServiceRroleKey);
+  const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
 
   // 한국교통안전공단 API 클라이언트
   const koroads = new KoroadsApi(koroadsApiKey);
@@ -193,7 +187,7 @@ async function processParkingRecord(
     .from('parking_sources')
     .select('parking_lot_id')
     .eq('source_type', 'koroads')
-    .eq('external_id', parking.parklot_id)
+    .eq('external_id', parking.prk_center_id)
     .single();
 
   if (existingSource) {
@@ -201,12 +195,11 @@ async function processParkingRecord(
     const { error } = await supabase
       .from('parking_lots')
       .update({
-        name: parking.parklot_name,
-        address: `${parking.parklot_addr}${parking.addr_detail ? ' ' + parking.addr_detail : ''}`,
-        latitude: parking.lat,
-        longitude: parking.lon,
-        type: mapParkingType(parking.place_type),
-        price_info: parsePrice(parking.parking_fee),
+        name: parking.prk_plce_nm,
+        address: parking.prk_plce_adres,
+        latitude: parking.prk_plce_entrc_la,
+        longitude: parking.prk_plce_entrc_lo,
+        capacity: parking.prk_cmprt_co,
         last_synced_at: new Date().toISOString(),
         external_data: parking,
       })
@@ -220,12 +213,11 @@ async function processParkingRecord(
     const { data: newParking, error: insertError } = await supabase
       .from('parking_lots')
       .insert({
-        name: parking.parklot_name,
-        address: `${parking.parklot_addr}${parking.addr_detail ? ' ' + parking.addr_detail : ''}`,
-        latitude: parking.lat,
-        longitude: parking.lon,
-        type: mapParkingType(parking.place_type),
-        price_info: parsePrice(parking.parking_fee),
+        name: parking.prk_plce_nm,
+        address: parking.prk_plce_adres,
+        latitude: parking.prk_plce_entrc_la,
+        longitude: parking.prk_plce_entrc_lo,
+        capacity: parking.prk_cmprt_co,
         source_type: 'koroads',
         last_synced_at: new Date().toISOString(),
         external_data: parking,
@@ -242,8 +234,8 @@ async function processParkingRecord(
     const { error: sourceError } = await supabase.from('parking_sources').insert({
       parking_lot_id: newParking.id,
       source_type: 'koroads',
-      external_id: parking.parklot_id,
-      external_name: parking.parklot_name,
+      external_id: parking.prk_center_id,
+      external_name: parking.prk_plce_nm,
       raw_data: parking,
       synced_at: new Date().toISOString(),
     });
@@ -257,30 +249,6 @@ async function processParkingRecord(
 // ========================================
 // 헬퍼 함수
 // ========================================
-
-function mapParkingType(koroadsType: string): string {
-  const typeMap: Record<string, string> = {
-    '공공': 'public',
-    '민간': 'private',
-    '노외': 'public',
-    '부설': 'affiliate',
-  };
-  return typeMap[koroadsType] || 'public';
-}
-
-function parsePrice(priceStr: string): Record<string, any> {
-  const result: Record<string, any> = { raw: priceStr };
-
-  if (!priceStr) return result;
-
-  if (priceStr.includes('무료')) {
-    result.free = true;
-  }
-
-  // 더 복잡한 파싱 로직은 필요 시 추가
-
-  return result;
-}
 
 // ========================================
 // HTTP 핸들러
