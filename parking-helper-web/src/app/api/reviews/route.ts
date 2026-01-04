@@ -1,16 +1,20 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { reviewQuerySchema, reviewCreateSchema, validateRequest, formatZodError } from '@/lib/validation'
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams
-  const parking_lot_id = searchParams.get('parking_lot_id')
-  const place_id = searchParams.get('place_id')
-  const lat = searchParams.get('lat')
-  const lng = searchParams.get('lng')
-  const radius = searchParams.get('radius') || '500' // meters
-  const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50)
-  const cursor = searchParams.get('cursor')
-  const sort = searchParams.get('sort') || 'created_desc'
+  const searchParams = Object.fromEntries(request.nextUrl.searchParams)
+  
+  // 입력 검증
+  const validation = validateRequest(reviewQuerySchema, searchParams)
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: { code: 'BAD_REQUEST', message: formatZodError(validation.error) } },
+      { status: 400 }
+    )
+  }
+  
+  const { parking_lot_id, place_id, lat, lng, radius, limit, cursor, sort } = validation.data
 
   try {
     const supabase = await createClient()
@@ -58,9 +62,13 @@ export async function GET(request: NextRequest) {
         query = query.order('created_at', { ascending: false })
     }
 
-    // 커서 페이지네이션
+    // 커서 페이지네이션 (created_at, id 복합 커서)
     if (cursor) {
-      query = query.gt('id', cursor)
+      // cursor format: timestamp_uuid
+      const [timestamp, id] = cursor.split('_')
+      if (timestamp && id) {
+        query = query.or(`created_at.lt.${timestamp},and(created_at.eq.${timestamp},id.gt.${id})`)
+      }
     }
 
     const { data, error } = await query
@@ -75,7 +83,9 @@ export async function GET(request: NextRequest) {
     const response = {
       data: data || [],
       page: {
-        next_cursor: data && data.length === limit ? data[data.length - 1].id : null
+        next_cursor: data && data.length === limit 
+          ? `${data[data.length - 1].created_at}_${data[data.length - 1].id}` 
+          : null
       }
     }
 
@@ -103,42 +113,17 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { subject_type, parking_lot_id, place_id, latitude, longitude, rating, comment } = body
-
-    // 유효성 검사
-    if (!subject_type || !['parking_lot', 'place', 'location'].includes(subject_type)) {
+    
+    // 입력 검증
+    const validation = validateRequest(reviewCreateSchema, body)
+    if (!validation.success) {
       return NextResponse.json(
-        { error: { code: 'BAD_REQUEST', message: 'Invalid subject_type' } },
+        { error: { code: 'BAD_REQUEST', message: formatZodError(validation.error) } },
         { status: 400 }
       )
     }
-
-    if (rating && (rating < 1 || rating > 5)) {
-      return NextResponse.json(
-        { error: { code: 'BAD_REQUEST', message: 'Rating must be between 1 and 5' } },
-        { status: 400 }
-      )
-    }
-
-    // subject_type에 따른 필수 필드 검증
-    if (subject_type === 'parking_lot' && !parking_lot_id) {
-      return NextResponse.json(
-        { error: { code: 'BAD_REQUEST', message: 'parking_lot_id is required' } },
-        { status: 400 }
-      )
-    }
-    if (subject_type === 'place' && !place_id) {
-      return NextResponse.json(
-        { error: { code: 'BAD_REQUEST', message: 'place_id is required' } },
-        { status: 400 }
-      )
-    }
-    if (subject_type === 'location' && (!latitude || !longitude)) {
-      return NextResponse.json(
-        { error: { code: 'BAD_REQUEST', message: 'latitude and longitude are required' } },
-        { status: 400 }
-      )
-    }
+    
+    const { subject_type, parking_lot_id, place_id, latitude, longitude, rating, comment } = validation.data
 
     // 리뷰 생성
     const reviewData: any = {

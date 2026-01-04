@@ -1,0 +1,27 @@
+[
+    {
+        "name": "지하공용주차장",
+        "address": "서울 금천구 가산동",
+        "source": "kakaomap"
+    },
+    {
+        "name": "투지시스템",
+        "address": "서울 금천구 가산동",
+        "source": "kakaomap"
+    },
+    {
+        "name": "나이스파크 가산 아스크타워 주차장",
+        "address": "서울 금천구 디지털로10길 37",
+        "source": "kakaomap"
+    },
+    {
+        "name": "현대시티아울렛 가산점 주차장",
+        "address": "서울 금천구 디지털로10길 9",
+        "source": "kakaomap"
+    },
+    {
+        "name": "가산동공영주차장",
+        "address": "서울 금천구 시흥대로153길 53",
+        "source": "kakaomap"
+    }
+]

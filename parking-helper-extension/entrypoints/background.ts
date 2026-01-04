@@ -1,4 +1,5 @@
 import { defineBackground } from 'wxt/sandbox';
+import { browser } from 'wxt/browser';
 
 export default defineBackground(() => {
   console.log('파킹 헬퍼 백그라운드 서비스 시작됨');
@@ -94,10 +95,42 @@ export default defineBackground(() => {
       const key = `place_${request.placeId}`;
       browser.storage.local.get([key])
         .then((result) => {
-          sendResponse({
-            success: true,
-            data: result[key] || null
-          });
+          // 테스트용 샘플 데이터 추가
+          if (!result[key] && request.placeId === '33127220') {
+            // 거래소에서 테스트 데이터
+            const testData = {
+              reviews: [
+                {
+                  author: '김철수',
+                  rating: 4,
+                  content: '주차 공간이 넓어서 좋아요. 평일에는 여유있게 주차할 수 있습니다.'
+                },
+                {
+                  author: '이영희',
+                  rating: 3,
+                  content: '주말에는 사람이 많아서 주차하기 어려워요.'
+                }
+              ],
+              tips: [
+                {
+                  content: '오전 10시 이전에 가면 주차하기 편합니다.'
+                },
+                {
+                  content: '지하 2층이 더 여유롭습니다.'
+                }
+              ],
+              rating: '3.5'
+            };
+            sendResponse({
+              success: true,
+              data: testData
+            });
+          } else {
+            sendResponse({
+              success: true,
+              data: result[key] || null
+            });
+          }
         })
         .catch((error) => {
           console.error('데이터 조회 실패:', error);

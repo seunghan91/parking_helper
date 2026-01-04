@@ -9,7 +9,7 @@ process.env.SUPABASE_SERVICE_ROLE_KEY = 'test-service-key'
 global.fetch = vi.fn()
 
 // chrome API 모킹 (확장 프로그램 테스트용)
-global.chrome = {
+;(global as any).chrome = {
   tabs: {
     create: vi.fn()
   },

@@ -44,15 +44,15 @@ export async function trackEvent(event: AnalyticsEvent): Promise<void> {
       created_at: new Date().toISOString()
     }
     
-    // Supabase에 이벤트 저장 (테이블이 있을 때만)
-    // TODO: events 테이블 생성 후 주석 해제
-    // const { error } = await supabase
-    //   .from('events')
-    //   .insert([eventData])
+    // Supabase에 이벤트 저장
+    const { error } = await supabase
+      .from('events')
+      .insert([eventData])
     
-    // if (error) {
-    //   console.error('Failed to track event:', error)
-    // }
+    if (error) {
+      console.error('Failed to track event:', error)
+      // 실패 시에도 앱이 멈추지 않도록 함
+    }
     
     // Google Analytics 호출 (옵션)
     if (typeof window !== 'undefined' && (window as any).gtag) {

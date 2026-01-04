@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await params
+  const { id } = params
 
   try {
     const supabase = await createClient()
@@ -56,22 +56,22 @@ export async function GET(
       .order('created_at', { ascending: false })
       .limit(3)
 
-    // 평균 평점 계산
-    const { data: ratingData } = await supabase
-      .from('reviews')
-      .select('rating')
-      .eq('parking_lot_id', id)
-      .not('rating', 'is', null)
+    // 평균 평점 계산 (DB 집계 함수 사용)
+    const { data: ratingStats, error: ratingError } = await supabase
+      .rpc('get_average_rating', {
+        target_id: id,
+        target_type: 'parking_lot'
+      })
+      .single()
 
-    const avgRating = ratingData && ratingData.length > 0
-      ? ratingData.reduce((sum, r) => sum + r.rating, 0) / ratingData.length
-      : null
+    const avgRating = ratingStats?.average_rating || null
+    const ratingCount = ratingStats?.rating_count || 0
 
     const response = {
       data: {
         ...parkingLot,
         average_rating: avgRating,
-        rating_count: ratingData?.length || 0,
+        rating_count: ratingCount,
         recent_reviews: reviews || [],
         recent_tips: tips || []
       }

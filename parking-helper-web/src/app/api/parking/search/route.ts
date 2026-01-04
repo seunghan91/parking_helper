@@ -1,14 +1,20 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { parkingSearchSchema, validateRequest, formatZodError } from '@/lib/validation'
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams
-  const q = searchParams.get('q')
-  const lat = searchParams.get('lat')
-  const lng = searchParams.get('lng')
-  const radius = searchParams.get('radius') || '1000' // meters
-  const limit = Math.min(parseInt(searchParams.get('limit') || '20'), 50)
-  const cursor = searchParams.get('cursor')
+  const searchParams = Object.fromEntries(request.nextUrl.searchParams)
+  
+  // 입력 검증
+  const validation = validateRequest(parkingSearchSchema, searchParams)
+  if (!validation.success) {
+    return NextResponse.json(
+      { error: { code: 'BAD_REQUEST', message: formatZodError(validation.error) } },
+      { status: 400 }
+    )
+  }
+  
+  const { q, lat, lng, radius, limit, cursor } = validation.data
 
   try {
     const supabase = await createClient()
@@ -49,9 +55,13 @@ export async function GET(request: NextRequest) {
         .lte('longitude', lngNum + lngDelta)
     }
 
-    // 커서 페이지네이션
+    // 커서 페이지네이션 (created_at, id 복합 커서)
     if (cursor) {
-      query = query.gt('id', cursor)
+      // cursor format: timestamp_uuid
+      const [timestamp, id] = cursor.split('_')
+      if (timestamp && id) {
+        query = query.or(`created_at.lt.${timestamp},and(created_at.eq.${timestamp},id.gt.${id})`)
+      }
     }
 
     query = query.order('created_at', { ascending: false })
@@ -68,7 +78,9 @@ export async function GET(request: NextRequest) {
     const response = {
       data: data || [],
       page: {
-        next_cursor: data && data.length === limit ? data[data.length - 1].id : null
+        next_cursor: data && data.length === limit 
+          ? `${data[data.length - 1].created_at}_${data[data.length - 1].id}` 
+          : null
       }
     }
 

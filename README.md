@@ -1,32 +1,77 @@
-# 파킹 헬퍼 (Parking Helper)
+# 🚗 파킹 헬퍼 (Parking Helper)
 
-실사용자 기반 주차 정보 통합 플랫폼
+> 대한민국 No.1 실사용자 기반 주차 정보 통합 플랫폼
 
-## 개요
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/your-username/parking-helper)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome-Extension-yellow.svg)](https://chrome.google.com/webstore)
 
-파킹 헬퍼는 네이버, 카카오, 구글 지도 사용자에게 실시간 주차 정보와 꿀팁을 제공하는 서비스입니다.
+## 🎯 비전
 
-### 주요 기능
-- 🗺️ 주요 지도 서비스와 통합된 크롬 확장 프로그램
-- 📍 실시간 주차장 정보 및 요금 안내
-- 💡 실사용자들의 주차 꿀팁 공유
-- ⭐ 주차장 리뷰 및 평점 시스템
+국내 주요 지도 서비스(네이버, 카카오, 구글) 사용자에게 가장 정확하고 유용한 실사용자 기반 주차 정보를 제공하여, 목적지 주변 주차 스트레스를 완벽하게 해소하는 대한민국 No.1 주차 정보 통합 플랫폼
 
-## 프로젝트 구조
+## ✨ 주요 기능
+
+### 🗺️ 지도 서비스 통합
+- **네이버 지도**: 실시간 주차장 정보 오버레이
+- **카카오맵**: 주차 리뷰 사이드바 통합
+- **구글 지도**: 주차 팁 자동 표시
+
+### 📍 주차 정보 서비스
+- **실시간 주차장 정보**: 위치, 요금, 운영시간
+- **사용자 리뷰**: 별점 평가 및 상세 후기
+- **주차 꿀팁**: 할인 정보, 숨은 주차장, 무료 주차 시간대
+- **즐겨찾기**: 자주 가는 주차장 저장
+
+### 💡 커뮤니티 기능
+- **익명 리뷰 작성**: 간편한 주차 경험 공유
+- **팁 공유**: 할인 쿠폰, 제휴 정보 등
+- **유용함 투표**: 좋은 리뷰 추천 시스템
+
+## 🏗️ 프로젝트 구조
 
 ```
 parking-helper/
-├── parking-helper-web/       # Next.js 웹 애플리케이션
-├── parking-helper-extension/ # 크롬 확장 프로그램
-└── docs/                    # 프로젝트 문서
+├── 📁 parking-helper-web/       # Next.js 웹 애플리케이션
+│   ├── src/
+│   │   ├── app/              # App Router 페이지
+│   │   ├── components/       # React 컴포넌트
+│   │   └── lib/             # 유틸리티 및 설정
+│   └── supabase/            # DB 마이그레이션
+│
+├── 📁 parking-helper-extension/  # WXT 크롬 확장 프로그램
+│   ├── entrypoints/         # 확장 프로그램 진입점
+│   │   ├── content.ts       # 콘텐츠 스크립트
+│   │   ├── background.ts    # 백그라운드 서비스 워커
+│   │   └── popup/          # 팝업 UI
+│   └── utils/              # 헬퍼 함수
+│
+└── 📁 docs/                     # 프로젝트 문서
+    ├── 01-prd.md           # 제품 요구사항
+    ├── 02-architecture.md   # 시스템 아키텍처
+    └── ...                 # 기타 문서
 ```
 
-## 기술 스택
+## 🛠️ 기술 스택
 
-- **Frontend**: Next.js, React, TypeScript, Tailwind CSS
-- **Backend**: Supabase (Auth, Database, Edge Functions)
-- **Extension**: Manifest V3, Content Scripts
-- **Deployment**: Vercel, Chrome Web Store
+### Frontend
+- **Framework**: Next.js 15 (App Router)
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 4.0 Beta
+- **State Management**: Zustand, React Query
+- **Testing**: Vitest, Playwright
+
+### Backend
+- **Database**: Supabase Postgres with RLS
+- **Authentication**: Supabase Auth (OAuth, Email/Password)
+- **API**: Next.js Route Handlers + Supabase Edge Functions
+- **Real-time**: Supabase Realtime subscriptions
+
+### Chrome Extension
+- **Framework**: WXT (Vite-based)
+- **Manifest**: V3
+- **Architecture**: Content Scripts + Service Worker
+- **Build**: TypeScript + Vite
 
 ## 시작하기
 

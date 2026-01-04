@@ -1,34 +1,47 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { placeIngestSchema, validateRequest, formatZodError } from '@/lib/validation'
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient()
     
+    // 인증 확인
+    const { data: { user }, error: authError } = await supabase.auth.getUser()
+    
+    if (authError || !user) {
+      return NextResponse.json(
+        { error: { code: 'UNAUTHORIZED', message: 'Authentication required' } },
+        { status: 401 }
+      )
+    }
+    
+    // 관리자 권한 확인 (profiles 테이블에 is_admin 필드가 있다고 가정)
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single()
+    
+    if (!profile?.is_admin) {
+      return NextResponse.json(
+        { error: { code: 'FORBIDDEN', message: 'Admin access required' } },
+        { status: 403 }
+      )
+    }
+    
     const body = await request.json()
-    const { 
-      provider, 
-      external_place_id, 
-      name, 
-      address, 
-      latitude, 
-      longitude 
-    } = body
-
-    // 유효성 검사
-    if (!provider || !external_place_id || !name) {
+    
+    // 입력 검증
+    const validation = validateRequest(placeIngestSchema, body)
+    if (!validation.success) {
       return NextResponse.json(
-        { error: { code: 'BAD_REQUEST', message: 'provider, external_place_id, and name are required' } },
+        { error: { code: 'BAD_REQUEST', message: formatZodError(validation.error) } },
         { status: 400 }
       )
     }
-
-    if (!['naver', 'kakao', 'google'].includes(provider)) {
-      return NextResponse.json(
-        { error: { code: 'BAD_REQUEST', message: 'Invalid provider' } },
-        { status: 400 }
-      )
-    }
+    
+    const { provider, external_place_id, name, address, latitude, longitude } = validation.data
 
     // 이미 존재하는 place_link 확인
     const { data: existingLink } = await supabase

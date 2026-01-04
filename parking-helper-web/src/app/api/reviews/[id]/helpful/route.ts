@@ -3,9 +3,9 @@ import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await params
+  const { id } = params
 
   try {
     const supabase = await createClient()
@@ -64,17 +64,15 @@ export async function POST(
       )
     }
 
-    // helpful_count 증가
+    // helpful_count 증가 (원자적 처리)
     const { error: updateError } = await supabase.rpc('increment_helpful_count', {
       review_id: id
     })
 
     if (updateError) {
-      // RPC 함수가 없는 경우 직접 업데이트
-      await supabase
-        .from('reviews')
-        .update({ helpful_count: supabase.raw('helpful_count + 1') })
-        .eq('id', id)
+      console.error('Failed to increment helpful count:', updateError)
+      // RPC가 실패한 경우에도 review_helpfuls 테이블에는 이미 추가되었으므로
+      // 일단 성공으로 처리하되, 로그를 남김
     }
 
     return NextResponse.json(
@@ -91,9 +89,9 @@ export async function POST(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
-  const { id } = await params
+  const { id } = params
 
   try {
     const supabase = await createClient()
@@ -122,17 +120,15 @@ export async function DELETE(
       )
     }
 
-    // helpful_count 감소
+    // helpful_count 감소 (원자적 처리)
     const { error: updateError } = await supabase.rpc('decrement_helpful_count', {
       review_id: id
     })
 
     if (updateError) {
-      // RPC 함수가 없는 경우 직접 업데이트
-      await supabase
-        .from('reviews')
-        .update({ helpful_count: supabase.raw('GREATEST(helpful_count - 1, 0)') })
-        .eq('id', id)
+      console.error('Failed to decrement helpful count:', updateError)
+      // RPC가 실패한 경우에도 review_helpfuls 테이블에서는 이미 삭제되었으므로
+      // 일단 성공으로 처리하되, 로그를 남김
     }
 
     return NextResponse.json(

@@ -23,7 +23,17 @@ export default defineConfig({
       'https://www.google.com/maps/*',
       'https://maps.google.com/*'
     ],
-    permissions: ['storage'],
+    permissions: ['storage', 'tabs', 'scripting'],
+    web_accessible_resources: [
+      {
+        resources: ['assets/*'],
+        matches: ['<all_urls>']
+      }
+    ],
+    action: {
+      default_popup: 'popup.html',
+      default_title: '파킹 헬퍼 - 주차 정보 확인'
+    },
     icons: {
       16: 'icon-16.png',
       48: 'icon-48.png',

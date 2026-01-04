@@ -227,7 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
   async function handleWriteReview() {
     console.log('리뷰 작성하기');
     
-    // 현재 탭에서 리뷰 폼 표시하도록 메시지 전송
     try {
       const [tab] = await browser.tabs.query({ 
         active: true, 
@@ -235,17 +234,41 @@ document.addEventListener('DOMContentLoaded', () => {
       }) as browser.Tabs.Tab[];
 
       if (tab?.id) {
-        // 콘텐츠 스크립트에 리뷰 작성 명령 전송
-        await browser.tabs.sendMessage(tab.id, {
-          type: 'SHOW_REVIEW_FORM'
-        });
+        // 현재 장소 정보 가져오기
+        let response: GetCurrentPlaceResponse | null = null;
         
-        window.close();
+        try {
+          response = await browser.tabs.sendMessage<any, GetCurrentPlaceResponse>(tab.id, {
+            type: 'GET_CURRENT_PLACE'
+          });
+          console.log('현재 장소 정보:', response);
+        } catch (err) {
+          console.log('장소 정보 가져오기 실패:', err);
+        }
+
+        if (response && response.place) {
+          // 장소 정보와 함께 리뷰 페이지로 이동
+          const baseUrl = process.env.NODE_ENV === 'development' 
+            ? 'http://localhost:3003'
+            : 'https://your-production-url.com';
+          const reviewUrl = new URL(`${baseUrl}/review`);
+          reviewUrl.searchParams.append('placeName', response.place.name || '');
+          reviewUrl.searchParams.append('placeAddress', response.place.address || '');
+          reviewUrl.searchParams.append('placeId', response.place.id || '');
+          
+          // 새 탭에서 리뷰 페이지 열기
+          await browser.tabs.create({ 
+            url: reviewUrl.toString()
+          });
+          
+          window.close();
+        } else {
+          // 장소 정보가 없을 때 안내
+          alert('지도에서 장소를 선택한 후 다시 시도해주세요.');
+        }
       }
     } catch (error) {
-      console.error('리뷰 폼 표시 실패:', error);
-      // 폴백: 구글 폼이나 임시 페이지로 연결
-      // await browser.tabs.create({ url: 'https://forms.google.com/parking-review' });
+      console.error('리뷰 페이지 열기 실패:', error);
     }
   }
 
